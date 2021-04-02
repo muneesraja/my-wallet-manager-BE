@@ -1,8 +1,4 @@
-const express = require("express");
-const router = express.Router();
-
-// Create
-
+const mongoose = require("mongoose");
 const Schema = new mongoose.Schema({
   name: {
     type: String,
@@ -33,8 +29,4 @@ const Schema = new mongoose.Schema({
   ],
 });
 
-// Delete Note
-
-// Update Note
-
-// Read Note
+module.exports = account = mongoose.model("Accounts", Schema);

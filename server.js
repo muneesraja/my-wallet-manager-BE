@@ -1,28 +1,16 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 const db = require("./db/db_conn");
-const userRoute = require("./routes/api/Users");
-const auth = require("./routes/api/auth");
+const router = require("./routes/router");
 
 // Body parser Middleware
 
 app.use(express.json());
-
-app.use("/api/v1/auth", auth);
-app.use("/api/v1/user", userRoute);
+app.use("/api/v1", router);
 
 // Initializing DB
 db();
-
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      name: "Munees",
-    },
-  });
-});
 
 app.listen(
   PORT,

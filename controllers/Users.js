@@ -1,9 +1,8 @@
 const { validationResult } = require("express-validator");
-const User = require("../../models/User");
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
-const { token } = require("morgan");
 
 // @desc  To get all users
 // Route GET /api/v1/user
@@ -80,4 +79,59 @@ exports.updateUser = (req, res, next) => {
 // Route DELETE /api/v1/user/:id
 exports.deleteUser = (req, res, next) => {
   res.send(`User ${req.params.id} has been Deleted successfully`);
+};
+
+// @desc Login User
+// Route POST /api/v1/login
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Check User is present in DB
+    const checkUser = await User.findOne({ email: email });
+    if (!checkUser) {
+      return res.status(401).json({ error: [{ msg: "Invalid Credentials" }] });
+    }
+    // Check password
+
+    const comparedPassword = await bcrypt.compare(password, checkUser.password);
+    if (!comparedPassword) {
+      return res.status(401).json({ error: [{ msg: "Invalid Credentials" }] });
+    }
+    // Providing User JWT Token
+    const payload = {
+      user: {
+        id: checkUser.id,
+      },
+    };
+    jwt.sign(
+      payload,
+      config.get("data.jwtSecret"),
+      {
+        expiresIn: 360000,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: [{ msg: "Internal Server Error" }] });
+  }
+};
+
+// @desc Get logged in user profile details
+// Route POST /api/v1/profile
+exports.getProfile = async (req, res, next) => {
+  try {
+    const data = await User.findById(req.user.id, "-password");
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: {
+        msg: "Internal Server Error",
+      },
+    });
+  }
 };
