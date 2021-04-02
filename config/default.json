@@ -1,0 +1,6 @@
+{
+  "data": {
+    "db": "mongodb+srv://muneesraja:india123@dev-connecter.mzbqp.mongodb.net/my-wallet-manager?retryWrites=true&w=majority",
+    "jwtSecret": "hackMeifyoucan@231@#!"
+  }
+}
